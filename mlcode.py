@@ -560,131 +560,131 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.callbacks import EarlyStopping
 
 # ---------- LSTM ----------
-with tabs[4]:
-    st.header(" Deep Learning (LSTM)")
-    if run:
-        df = feature_engineering(fetch_data(ticker_symbol, selected_interval))
-        features = [c for c in df.columns if c not in ["date","Close"]]
+# with tabs[4]:
+#     st.header(" Deep Learning (LSTM)")
+#     if run:
+#         df = feature_engineering(fetch_data(ticker_symbol, selected_interval))
+#         features = [c for c in df.columns if c not in ["date","Close"]]
 
-        # Scale features + target together
-        scaler = MinMaxScaler()
-        scaled = scaler.fit_transform(df[features + ["Close"]])
+#         # Scale features + target together
+#         scaler = MinMaxScaler()
+#         scaled = scaler.fit_transform(df[features + ["Close"]])
 
-        lookback = 60
-        X, y = [], []
-        for i in range(lookback, len(scaled)):
-            X.append(scaled[i-lookback:i, :-1])
-            y.append(scaled[i, -1])
-        X, y = np.array(X), np.array(y)
+#         lookback = 60
+#         X, y = [], []
+#         for i in range(lookback, len(scaled)):
+#             X.append(scaled[i-lookback:i, :-1])
+#             y.append(scaled[i, -1])
+#         X, y = np.array(X), np.array(y)
 
-        if len(X) < 100:
-            st.warning("Not enough data for LSTM at this interval.")
-        else:
-            split = int(0.7*len(X))
-            X_train, X_test = X[:split], X[split:]
-            y_train, y_test = y[:split], y[split:]
+#         if len(X) < 100:
+#             st.warning("Not enough data for LSTM at this interval.")
+#         else:
+#             split = int(0.7*len(X))
+#             X_train, X_test = X[:split], X[split:]
+#             y_train, y_test = y[:split], y[split:]
 
-            # Clear old session to avoid "NoneType pop" error
-            K.clear_session()
+#             # Clear old session to avoid "NoneType pop" error
+#             K.clear_session()
 
-            model = Sequential([
-                LSTM(64, return_sequences=True, input_shape=(X_train.shape[1], X_train.shape[2])),
-                Dropout(0.1),
-                LSTM(64),
-                Dense(1)
-            ])
-            model.compile(optimizer="adam", loss="mse")
+#             model = Sequential([
+#                 LSTM(64, return_sequences=True, input_shape=(X_train.shape[1], X_train.shape[2])),
+#                 Dropout(0.1),
+#                 LSTM(64),
+#                 Dense(1)
+#             ])
+#             model.compile(optimizer="adam", loss="mse")
 
-            # Early stopping
-            es = EarlyStopping(monitor="val_loss", patience=3, restore_best_weights=True)
+#             # Early stopping
+#             es = EarlyStopping(monitor="val_loss", patience=3, restore_best_weights=True)
 
-            model.fit(X_train, y_train,
-                      validation_split=0.1,
-                      epochs=50,
-                      batch_size=32,
-                      callbacks=[es],
-                      verbose=0)
+#             model.fit(X_train, y_train,
+#                       validation_split=0.1,
+#                       epochs=50,
+#                       batch_size=32,
+#                       callbacks=[es],
+#                       verbose=0)
 
-            # Predictions
-            preds = model.predict(X_test)
-            preds_rescaled = scaler.inverse_transform(
-                np.concatenate([np.zeros((len(preds), len(features))), preds], axis=1)
-            )[:,-1]
-            y_test_rescaled = scaler.inverse_transform(
-                np.concatenate([np.zeros((len(y_test), len(features))), y_test.reshape(-1,1)], axis=1)
-            )[:,-1]
+#             # Predictions
+#             preds = model.predict(X_test)
+#             preds_rescaled = scaler.inverse_transform(
+#                 np.concatenate([np.zeros((len(preds), len(features))), preds], axis=1)
+#             )[:,-1]
+#             y_test_rescaled = scaler.inverse_transform(
+#                 np.concatenate([np.zeros((len(y_test), len(features))), y_test.reshape(-1,1)], axis=1)
+#             )[:,-1]
 
-            # Metrics
-            mae, rmse, mape = evaluate(y_test_rescaled, preds_rescaled)
-            c1,c2,c3 = st.columns(3)
-            c1.metric("MAE", f"{mae:.2f}")
-            c2.metric("RMSE", f"{rmse:.2f}")
-            c3.metric("MAPE", f"{mape:.2f}%")
+#             # Metrics
+#             mae, rmse, mape = evaluate(y_test_rescaled, preds_rescaled)
+#             c1,c2,c3 = st.columns(3)
+#             c1.metric("MAE", f"{mae:.2f}")
+#             c2.metric("RMSE", f"{rmse:.2f}")
+#             c3.metric("MAPE", f"{mape:.2f}%")
 
-            # Actual vs Predicted
-            df_results = pd.DataFrame({"Actual": y_test_rescaled, "Predicted": preds_rescaled})
-            fig = go.Figure()
-            fig.add_trace(go.Scatter(y=df_results["Actual"], mode="lines", name="Actual", line=dict(color="blue")))
-            fig.add_trace(go.Scatter(y=df_results["Predicted"], mode="lines", name="Predicted", line=dict(color="orange", dash="dot")))
-            st.plotly_chart(fig, use_container_width=True)
+#             # Actual vs Predicted
+#             df_results = pd.DataFrame({"Actual": y_test_rescaled, "Predicted": preds_rescaled})
+#             fig = go.Figure()
+#             fig.add_trace(go.Scatter(y=df_results["Actual"], mode="lines", name="Actual", line=dict(color="blue")))
+#             fig.add_trace(go.Scatter(y=df_results["Predicted"], mode="lines", name="Predicted", line=dict(color="orange", dash="dot")))
+#             st.plotly_chart(fig, use_container_width=True)
 
-            # Residuals
-            df_results["Residuals"] = df_results["Actual"] - df_results["Predicted"]
-            fig2 = go.Figure()
-            fig2.add_trace(go.Scatter(y=df_results["Residuals"], mode="lines", name="Residuals", line=dict(color="purple")))
-            fig2.add_hline(y=0, line_dash="dash", line_color="gray")
-            st.plotly_chart(fig2, use_container_width=True)
+#             # Residuals
+#             df_results["Residuals"] = df_results["Actual"] - df_results["Predicted"]
+#             fig2 = go.Figure()
+#             fig2.add_trace(go.Scatter(y=df_results["Residuals"], mode="lines", name="Residuals", line=dict(color="purple")))
+#             fig2.add_hline(y=0, line_dash="dash", line_color="gray")
+#             st.plotly_chart(fig2, use_container_width=True)
 
-            # Directional Accuracy
-            df_results["Actual_Dir"] = df_results["Actual"].diff().apply(lambda x: 1 if x > 0 else -1)
-            df_results["Pred_Dir"] = df_results["Predicted"].diff().apply(lambda x: 1 if x > 0 else -1)
-            df_results.dropna(inplace=True)
-            dir_acc = (df_results["Actual_Dir"] == df_results["Pred_Dir"]).mean() * 100
-            st.metric("Directional Accuracy", f"{dir_acc:.2f}%")
+#             # Directional Accuracy
+#             df_results["Actual_Dir"] = df_results["Actual"].diff().apply(lambda x: 1 if x > 0 else -1)
+#             df_results["Pred_Dir"] = df_results["Predicted"].diff().apply(lambda x: 1 if x > 0 else -1)
+#             df_results.dropna(inplace=True)
+#             dir_acc = (df_results["Actual_Dir"] == df_results["Pred_Dir"]).mean() * 100
+#             st.metric("Directional Accuracy", f"{dir_acc:.2f}%")
 
-            # ---- Next Predictions ----
-            st.subheader("📌 Next Predictions")
+#             # ---- Next Predictions ----
+#             st.subheader("📌 Next Predictions")
 
-            def interval_to_offset(interval: str):
-                mapping = {
-                    "1m": "1min", "2m": "2min", "5m": "5min", "15m": "15min",
-                    "30m": "30min", "60m": "60min", "90m": "90min", "1h": "1h",
-                    "1d": "1d", "5d": "5d", "1wk": "7d", "1mo": "30d", "3mo": "90d"
-                }
-                return mapping.get(interval, "1d")
+#             def interval_to_offset(interval: str):
+#                 mapping = {
+#                     "1m": "1min", "2m": "2min", "5m": "5min", "15m": "15min",
+#                     "30m": "30min", "60m": "60min", "90m": "90min", "1h": "1h",
+#                     "1d": "1d", "5d": "5d", "1wk": "7d", "1mo": "30d", "3mo": "90d"
+#                 }
+#                 return mapping.get(interval, "1d")
 
-            offset = interval_to_offset(selected_interval)
+#             offset = interval_to_offset(selected_interval)
 
-            last_seq = X_test[-1:]
-            preds_future, future_dates = [], []
-            last_date = df["date"].iloc[-1]
+#             last_seq = X_test[-1:]
+#             preds_future, future_dates = [], []
+#             last_date = df["date"].iloc[-1]
 
-            for _ in range(forecast_periods):
-                p = model.predict(last_seq)[0][0]
+#             for _ in range(forecast_periods):
+#                 p = model.predict(last_seq)[0][0]
 
-                inv_p = scaler.inverse_transform(
-                    np.concatenate([np.zeros((1, len(features))), np.array(p).reshape(1,1)], axis=1)
-                )[0,-1]
-                preds_future.append(inv_p)
+#                 inv_p = scaler.inverse_transform(
+#                     np.concatenate([np.zeros((1, len(features))), np.array(p).reshape(1,1)], axis=1)
+#                 )[0,-1]
+#                 preds_future.append(inv_p)
 
-                next_date = last_date + pd.to_timedelta(offset)
-                future_dates.append(next_date)
+#                 next_date = last_date + pd.to_timedelta(offset)
+#                 future_dates.append(next_date)
 
-                # update sequence
-                new_step = np.zeros((1,1,last_seq.shape[2]))
-                new_step[0,0,-1] = p
-                last_seq = np.concatenate([last_seq[:,1:,:], new_step], axis=1)
+#                 # update sequence
+#                 new_step = np.zeros((1,1,last_seq.shape[2]))
+#                 new_step[0,0,-1] = p
+#                 last_seq = np.concatenate([last_seq[:,1:,:], new_step], axis=1)
 
-                last_date = next_date
+#                 last_date = next_date
 
-            df_future = pd.DataFrame({"Date": future_dates, "Predicted_Close": preds_future})
-            st.dataframe(df_future)
+#             df_future = pd.DataFrame({"Date": future_dates, "Predicted_Close": preds_future})
+#             st.dataframe(df_future)
 
-    else:
-        st.info("""
-Enter Stock/Crypto/Commodity Symbol from Yahoo Finance (e.g., US Stocks: `AAPL`, `MSFT`; Indian Stocks: `RELIANCE.NS`, `TCS.NS`; Crypto: `BTC-USD`, `ETH-USD`; Indices: `^NSEI`, `^DJI`; Commodities: `GC=F`, `CL=F`).  
-Click ▶️ Run Forecast to see predictions (typing a ticker overrides dropdown selection).
-""")
+#     else:
+#         st.info("""
+# Enter Stock/Crypto/Commodity Symbol from Yahoo Finance (e.g., US Stocks: `AAPL`, `MSFT`; Indian Stocks: `RELIANCE.NS`, `TCS.NS`; Crypto: `BTC-USD`, `ETH-USD`; Indices: `^NSEI`, `^DJI`; Commodities: `GC=F`, `CL=F`).  
+# Click ▶️ Run Forecast to see predictions (typing a ticker overrides dropdown selection).
+# """)
 # ================================
 # Part 3: Constituents, Portfolio, Overview
 # ================================
@@ -743,7 +743,7 @@ BANKNIFTY = [
 
 
 # ---------- NIFTY Constituents ----------
-with tabs[5]:
+with tabs[4]:
     st.header("📉 NIFTY Constituents Predictions & Correlation")
 
     model_choice = st.selectbox("Model", ["LR","RF","XGB"], index=1, key="nifty_model")
@@ -798,7 +798,7 @@ with tabs[5]:
 
 
 # ---------- BankNIFTY Constituents ----------
-with tabs[6]:
+with tabs[5]:
     st.header("🏦 BankNIFTY Constituents Predictions & Correlation")
 
     model_choice = st.selectbox("Model", ["LR","RF","XGB"], index=1, key="bank_model")
