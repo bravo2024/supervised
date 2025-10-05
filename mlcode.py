@@ -557,7 +557,6 @@ with tabs[3]:
 from tensorflow.keras import backend as K
 
 
-from tensorflow.keras import backend as K
 from tensorflow.keras.callbacks import EarlyStopping
 
 # ---------- LSTM ----------
