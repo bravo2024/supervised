@@ -47,7 +47,7 @@ tickers_list = [
 with st.sidebar:
     st.markdown("### 📈 Asset Symbol Options")
 
-    ticker_input = st.text_input("Type your ticker:", "AAPL", key="ticker_input").upper()
+    ticker_input = st.text_input("Type your ticker:", "AAPL", key="sidebar_ticker_input").upper()
     ticker_options = [ticker_input] + [t for t in tickers_list if t != ticker_input]
     ticker_symbol = st.selectbox("Or select any ticker from list:", ticker_options, index=0)
 
