@@ -1,6 +1,12 @@
 streamlit
-click
 yfinance
 pandas
-prophet
+numpy
 matplotlib
+seaborn
+plotly
+ta
+scikit-learn
+xgboost
+tensorflow
+scipy
