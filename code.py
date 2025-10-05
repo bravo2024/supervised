@@ -749,7 +749,7 @@ with tabs[5]:
 
     model_choice = st.selectbox("Model", ["LR","RF","XGB"], index=1, key="nifty_model")
 
-    if st.button("🔮 Predict"):
+    if st.button("🔮 Predict",key="nifty_predict"):
         with st.spinner("Running predictions... please wait"):
             # predict for constituents
             df_preds = batch_predict(NIFTY50, selected_interval, model_choice, forecast_periods)
@@ -804,7 +804,7 @@ with tabs[6]:
 
     model_choice = st.selectbox("Model", ["LR","RF","XGB"], index=1, key="bank_model")
 
-    if st.button("🔮 Predict BankNIFTY"):
+    if st.button("🔮 Predict BankNIFTY",key="banknifty_predict"):
         with st.spinner("Running predictions... please wait"):
             # constituents
             df_preds = batch_predict(BANKNIFTY, selected_interval, model_choice, forecast_periods)
