@@ -52,11 +52,11 @@ with st.sidebar:
     ticker_symbol = st.selectbox("Or select any ticker from list:", ticker_options, index=0)
 
     interval_options = ['1m','2m','5m','15m','30m','60m','90m','1h','1d','5d','1wk','1mo','3mo']
-    selected_interval = st.selectbox("Select Time Interval:", interval_options, index=3)
+    selected_interval = st.selectbox("Select Time Interval:", interval_options, index=3,key="interval_select")
 
-    forecast_periods = st.slider("Forecast Periods (future points)", 1, 50, 5)
+    forecast_periods = st.slider("Forecast Periods (future points)", 1, 50, 5,key="forecast_slider")
 
-    run = st.button("▶️ Run Forecast For Asset")
+    run = st.button("▶️ Run Forecast For Asset",key="run_button")
 
     st.write("Ticker:", ticker_symbol)
     st.write("Interval:", selected_interval)
