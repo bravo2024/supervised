@@ -27,7 +27,6 @@ tabs = st.tabs([
     "📈 Multiple Linear Regression",
     "🌲 Random Forest",
     "⚡ XGBoost",
-   
     "📉 NIFTY Constituents",
     "🏦 BankNIFTY Constituents"
     
@@ -554,10 +553,6 @@ with tabs[3]:
         st.info("Enter a ticker and click ▶️ Run Forecast to see XGBoost results.")
 
 
-from tensorflow.keras import backend as K
-
-
-from tensorflow.keras.callbacks import EarlyStopping
 
 # ---------- LSTM ----------
 # with tabs[4]:
