@@ -27,7 +27,7 @@ tabs = st.tabs([
     "📈 Multiple Linear Regression",
     "🌲 Random Forest",
     "⚡ XGBoost",
-    "🧬 Deep Learning (LSTM)",
+   
     "📉 NIFTY Constituents",
     "🏦 BankNIFTY Constituents"
     
