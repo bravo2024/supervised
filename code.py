@@ -16,8 +16,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from xgboost import XGBRegressor
 
 from sklearn.preprocessing import MinMaxScaler
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense, Dropout
+
 
 # ---------- Streamlit Setup ----------
 st.set_page_config("Market Forecasting (LR, RF, XGB, LSTM)", layout="wide")
