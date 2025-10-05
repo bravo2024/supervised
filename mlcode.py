@@ -64,9 +64,9 @@ with st.sidebar:
 
 # ---------- Data Fetch ----------
 def fetch_data(ticker, interval):
-    if interval in ["1m", "2m", "5m","15m"]:
+    if interval in ["1m", "2m", "5m"]:
         period = "5d"
-    elif interval in ["30m",  "60m"]:
+    elif interval in ["15m","30m",  "60m"]:
     
         period = "1mo"
     elif interval in [ "90m", "1h"]:
